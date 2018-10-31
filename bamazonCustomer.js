@@ -56,8 +56,6 @@ function inquireCustomer() {
                 name: "purchase_num"
             }
         ]).then(function(input) {
-            // console.log(input.product_ID);
-            // console.log(input.purchase_num);
             connection.query("SELECT * FROM products", function(err, data) {
                 if (err) throw err;
 
