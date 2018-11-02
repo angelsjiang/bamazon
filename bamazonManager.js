@@ -75,37 +75,7 @@ function viewLowInventory() {
     })
 };
 
-// Don't think I need this here
-function addDepartment() {
-    connection.query('SELECT * FROM products', function(err, data) {
-        if(err) throw err;
-
-        console.log('\n--------- Here are the existing Departments ---------');
-        for(var i = 0; i < data.length; i++) {
-            console.log(data[i].department_name + '\n');
-        };
-        inquirer
-            .prompt([
-                {
-                    type: 'list',
-                    message: 'Do you want to add a new department?',
-                    choices: ['Yes', 'No'],
-                    name: 'options'
-                }
-            ]).then(function(res) {
-                if(res.options === 'Yes') {
-                    console.log("\nYou wish to add a new department.");
-                }
-                else {
-                    addInventory();
-                }
-            });
-        connection.end();
-    })
-};
-
 function UpdateInventory() {
-
     var list = [];
     connection.query('SELECT * FROM products', function(err, data) {
         if (err) throw err;

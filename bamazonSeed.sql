@@ -21,5 +21,6 @@ CREATE TABLE products (
     product_name VARCHAR (50) NOT NULL,
     department_name VARCHAR(30) NOT NULL,
     price DECIMAL(6,2),
-    stock_quantity INT NOT NULL
+    stock_quantity INT NOT NULL,
+    product_sales DECIMAL(10,2)
 );

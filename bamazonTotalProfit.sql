@@ -1,0 +1,4 @@
+USE BamazonDB;
+
+SELECT
+    DIFFERENCE()

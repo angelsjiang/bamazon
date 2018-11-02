@@ -25,7 +25,7 @@ function afterConnection() {
         console.log("DONE.");
 
         readSaleData();
-        inquireCustomer(); // PROBLEM!! ASYNCHRONOUS CALL
+         // PROBLEM!! ASYNCHRONOUS CALL
         // NEED TO CORRECT IT
     });
 };
@@ -39,6 +39,7 @@ function readSaleData() {
             console.log("\n" + data[i].item_id + ". " + data[i].product_name + "--- $" + data[i].price);
         };
         console.log("\n---------------------------------------------------\n");
+        inquireCustomer();
     });
 };
 
@@ -69,13 +70,23 @@ function inquireCustomer() {
 
                             var itemPurchased = input.purchase_num;
                             var itemName = data[i].product_name;
+
+                            // update product_sales
+                            var itemPrice = data[i].price;
+                            var productSales = itemPurchased * itemPrice;
+                            var productNewSales = productSales + data[i].product_sales;
+                            var departmentName = data[i].department_name;
+
+                            updateDepTable(departmentName, productNewSales);
+                            caculateProfit(departmentName, productNewSales);
                             
-                            // NEED TO PUT IN AN UPDATE FUNCTION
-                            var query = connection.query(
+                            // update the products table
+                            connection.query(
                                 "UPDATE products SET ? WHERE?",
                                 [
                                     {
-                                        stock_quantity: newQuantity
+                                        stock_quantity: newQuantity,
+                                        product_sales: productNewSales
                                     },
                                     {
                                         item_id: input.product_ID
@@ -86,12 +97,63 @@ function inquireCustomer() {
 
                                     console.log("Purchase success! You have purchased " + 
                                         itemPurchased + " of " + itemName + "!");
+                                    connection.end();
                                 }
                             )
                         }
                     }
                 }
-                connection.end();
             })
         })
+};
+
+// update the departments table
+function updateDepTable(department, newSales) {
+    connection.query(
+        'UPDATE departments SET ? WHERE ?',
+        [
+            {
+                product_sales: newSales
+            },
+            {
+                department_name: department
+            }
+        ],
+        function(err, res) {
+            if(err) throw err;
+
+            console.log(res.affectedRows + " departments got updated!");
+        }
+    )
+};
+
+function caculateProfit(department, newSales) {
+    var overHeadCosts;
+    connection.query('SELECT * FROM departments', function(err, data) {
+        if(err) throw err;
+
+        for(var i = 0; i < data.length; i++) {
+            if(department === data[i].department_name) {
+                overHeadCosts = data[i].over_head_costs;
+            };
+        };
+
+        var newTotalProfit = newSales - overHeadCosts;
+
+        connection.query(
+            'UPDATE departments SET ? WHERE ?',
+            [
+                {
+                    total_profit: newTotalProfit
+                },
+                {
+                    department_name: department
+                }
+            ],
+            function(err, res) {
+                if(err) throw err;
+                console.log(res.affectedRows);
+            }
+        )
+    })
 };
