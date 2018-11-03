@@ -37,7 +37,37 @@ function inquiring() {
 
 function viewProductSales() {
     console.log('View departments!');
+    connection.query('SELECT * FROM departments', function(err, data) {
+        if(err) throw err;
+
+        console.log('\n----------------- Departments information -----------------\n');
+        console.log('department_id ------ department_name ------ over_head_costs ------ product_sales ------- total_profit');
+        for(var i = 0; i < data.length; i++ ){
+            console.log(data[i].department_id + ' ------ ' + data[i].department_name + ' ------ ' 
+                + data[i].over_head_costs + ' ------ ' + data[i].product_sales + ' ------ ' + data[i].total_profit);
+        }
+        continueInquire();
+    })
 };
+
+function continueInquire() {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'What else do you want to do?',
+                choices: ['Create New Department', "That's it"],
+                name: 'options'
+            }
+        ]).then(function(res) {
+            if(res.name === "Create New Department") {
+                createDepartment(); // Not sure why this is not working
+            }
+            else {
+                connection.end();
+            }
+        })
+}
 
 
 // Don't think I need this here
