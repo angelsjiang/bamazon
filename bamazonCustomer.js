@@ -97,7 +97,8 @@ function inquireCustomer() {
 
                                     console.log("Purchase success! You have purchased " + 
                                         itemPurchased + " of " + itemName + "!");
-                                    connection.end();
+                                    console.log("Thank you for shopping!");
+                                    continueAction();
                                 }
                             )
                         }
@@ -106,6 +107,26 @@ function inquireCustomer() {
             })
         })
 };
+
+function continueAction() {
+    inquirer
+        .prompt([
+            {
+                type: 'list',
+                message: 'Would you like to purchase another item?',
+                choices: ['Yes', 'No'],
+                name: 'options'
+            }
+        ]).then(function(res) {
+            if(res.options === 'Yes') {
+                readSaleData();
+            }
+            else {
+                connection.end();
+                return;
+            }
+        })
+}
 
 // update the departments table
 function updateDepTable(department, newSales) {
@@ -122,7 +143,7 @@ function updateDepTable(department, newSales) {
         function(err, res) {
             if(err) throw err;
 
-            console.log(res.affectedRows + " departments got updated!");
+            // console.log(res.affectedRows + " departments got updated!");
         }
     )
 };
@@ -152,7 +173,7 @@ function caculateProfit(department, newSales) {
             ],
             function(err, res) {
                 if(err) throw err;
-                console.log(res.affectedRows);
+                // console.log(res.affectedRows);
             }
         )
     })

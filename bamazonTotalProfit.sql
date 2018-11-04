@@ -1,4 +1,0 @@
-USE BamazonDB;
-
-SELECT
-    DIFFERENCE()

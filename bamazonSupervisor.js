@@ -60,8 +60,9 @@ function continueInquire() {
                 name: 'options'
             }
         ]).then(function(res) {
-            if(res.name === "Create New Department") {
-                createDepartment(); // Not sure why this is not working
+            console.log(res);
+            if(res.options === "Create New Department") {
+                createDepartment();
             }
             else {
                 connection.end();
@@ -102,8 +103,8 @@ function createDepartment() {
                     if(err) throw err;
 
                     console.log(res2.affectedRows + " department added!");
+                    continueInquire();
                 }
             )
-            connection.end();
         })
 };

@@ -23,7 +23,7 @@ function ManagerOptions() {
             {
                 type: "list",
                 message: "What do you want to do?",
-                choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product'],
+                choices: ['View Products for Sale', 'View Low Inventory', 'Update products in Inventory', 'Add New Product', 'Nothing'],
                 name: "options"
             }
         ]).then(function(data) {
@@ -36,13 +36,17 @@ function ManagerOptions() {
                 console.log('view low inventory!');
                 viewLowInventory();
             }
-            else if(data.options === 'Add to Inventory') {
-                console.log('add to inventory!');
+            else if(data.options === 'Update products in Inventory') {
+                console.log('Update inventory!');
                 UpdateInventory()
             }
             else if(data.options === 'Add New Product') {
                 console.log('add new product!');
                 addInventory();
+            }
+            else {
+                connection.end();
+                return;
             }
         });
 };
@@ -56,7 +60,7 @@ function viewProducts() {
             console.log(data[i].item_id + '. ' + data[i].product_name + ' ------ $' + data[i].price + '/per');
         };
         console.log('\n-----------------------------------------------------------');
-        connection.end();
+        continueAction();
     });
 };
 
@@ -64,14 +68,14 @@ function viewLowInventory() {
     connection.query('SELECT * FROM products', function(err, data) {
         if(err) throw err;
 
-        console.log('\n------------- Low Inventory Info --------------');
+        console.log('\n------------- Low Inventory Info (stock below 200) --------------');
         for(var i = 0; i < data.length; i++) {
             if(data[i].stock_quantity < 200) {
                 console.log(data[i].item_id + '. ' + data[i].product_name + ' ------ ' + data[i].stock_quantity + " remaining.");
             }
         };
         console.log('\n-----------------------------------------------------------');
-        connection.end();
+        continueAction();
     })
 };
 
@@ -126,9 +130,9 @@ function addtoInventory(quantity,name) {
             if(err) throw err;
 
             console.log(res.affectedRows + " products updated!\n");
+            continueAction();
         }
     )
-    connection.end();
 }
 
 
@@ -175,9 +179,28 @@ function addInventory() {
                 function(err, res) {
                     if(err) throw err;
                     console.log(res.affectedRows + " product added!\n");
+                    continueAction();
                 }
             )
-            connection.end();
         });
 };
 
+function continueAction() {
+    inquirer
+        .prompt([
+            {
+                type: "list",
+                message: "Would you like to do something else?",
+                choices: ['Yes','No'],
+                name: "options"
+            }
+        ]).then(function(res) {
+            if(res.options === 'Yes') {
+                ManagerOptions();
+            }
+            else {
+                connection.end();
+                return;
+            }
+        })
+}
